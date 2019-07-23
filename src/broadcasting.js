@@ -36,7 +36,7 @@ class Broadcasting extends EventEmitter {
 
     if (this.config.driver == 'pusher') {
 
-      window.Pusher = require('pusher-js')
+      window.Pusher = Pusher || require('pusher-js')
       this.echo = new Echo({
         broadcaster: 'pusher',
         key: this.config.key,
@@ -50,7 +50,7 @@ class Broadcasting extends EventEmitter {
 
     } else if (this.config.driver == 'redis') {
 
-      window.io = require('socket.io-client')
+      window.io = io || require('socket.io-client')
       this.echo = new Echo({
         broadcaster: 'socket.io',
         host: location.host,
@@ -87,12 +87,26 @@ class Broadcasting extends EventEmitter {
     })
   }
 
+  disconnect () {
+    if (this.echo) {
+      this.echo.disconnect()
+      this.status = null
+      delete this.echo
+    }
+  }
+
   channel (name) {
     this._init()
 
     this._log(`channel ${name}`)
 
     return this.echo.channel(name)
+  }
+
+  leave (channel) {
+    if (this.echo) {
+      this.echo.leave(channel)
+    }
   }
 }
 
