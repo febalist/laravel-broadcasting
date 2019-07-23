@@ -11,12 +11,12 @@ class Broadcasting extends EventEmitter {
     for (let event of ['connected', 'disconnected']) {
       this.defineEvent(event)
       this.on(event, () => {
-        this.log(event)
+        this._log(event)
       })
     }
   }
 
-  log (message) {
+  _log (message) {
     if (window.console && console.log) {
       console.log(`broadcasting: ${message}`)
     }
@@ -24,10 +24,10 @@ class Broadcasting extends EventEmitter {
 
   start () {
     if (this.echo) {
-      return;
+      return
     }
 
-    this.log(`connecting ${this.config.driver}...`)
+    this._log(`connecting ${this.config.driver}...`)
 
     if (this.config.driver == 'pusher') {
 
@@ -91,7 +91,7 @@ class Broadcasting extends EventEmitter {
   channel (name) {
     this.start()
 
-    this.log(`channel ${name}`)
+    this._log(`channel ${name}`)
 
     return this.echo.channel(name)
   }
