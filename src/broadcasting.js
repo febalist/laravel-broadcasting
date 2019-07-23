@@ -1,36 +1,55 @@
 import EventEmitter from 'wolfy87-eventemitter'
 import Echo from 'laravel-echo'
 
-export default class Broadcasting extends EventEmitter {
-  constructor (config) {
+class Broadcasting extends EventEmitter {
+  constructor () {
     super()
 
-    this.config = config
+    this.config = app.broadcasting
     this.connected = null
+
+    for (let event of ['connected', 'disconnected']) {
+      this.defineEvent(event)
+      this.on(event, () => {
+        this.log(event)
+      })
+    }
+  }
+
+  log (message) {
+    if (window.console && console.log) {
+      console.log(`broadcasting: ${message}`)
+    }
   }
 
   start () {
+    if (this.echo) {
+      return;
+    }
+
+    this.log(`connecting ${this.config.driver}...`)
+
     if (this.config.driver == 'pusher') {
 
-      this.pusher = require('pusher-js')
+      window.Pusher = require('pusher-js')
       this.echo = new Echo({
         broadcaster: 'pusher',
         key: this.config.key,
         cluster: this.config.cluster,
-        encrypted: true,
+        encrypted: this.config.encrypted,
       })
 
       this.echo.connector.pusher.connection.bind('state_change', states => {
         const connected = states.current == 'connected'
         if (this.connected !== connected) {
           this.connected = connected
-          this.emit(connected ? 'connected' : 'disconnect')
+          this.emit(connected ? 'connected' : 'disconnected')
         }
       })
 
     } else if (this.config.driver == 'redis') {
 
-      this.io = require('socket.io-client')
+      window.io = require('socket.io-client')
       this.echo = new Echo({
         broadcaster: 'socket.io',
         host: location.host,
@@ -42,10 +61,13 @@ export default class Broadcasting extends EventEmitter {
       })
       this.echo.connector.socket.on('disconnect', () => {
         this.connected = false
-        this.emit('disconnect')
+        this.emit('disconnected')
       })
 
+    } else {
+      throw new Error(`Unsupported broadcasting driver "${this.config.driver}"`)
     }
+
   }
 
   channel (name) {
@@ -53,6 +75,10 @@ export default class Broadcasting extends EventEmitter {
       this.start()
     }
 
+    this.log(`channel ${name}`)
+
     return this.echo.channel(name)
   }
 }
+
+window.broadcasting = new Broadcasting()
