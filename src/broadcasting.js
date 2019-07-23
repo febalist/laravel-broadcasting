@@ -36,7 +36,7 @@ class Broadcasting extends EventEmitter {
 
     if (this.config.driver == 'pusher') {
 
-      window.Pusher = Pusher || require('pusher-js')
+      window.Pusher = window.Pusher || require('pusher-js')
       this.echo = new Echo({
         broadcaster: 'pusher',
         key: this.config.key,
@@ -50,7 +50,7 @@ class Broadcasting extends EventEmitter {
 
     } else if (this.config.driver == 'redis') {
 
-      window.io = io || require('socket.io-client')
+      window.io = window.io || require('socket.io-client')
       this.echo = new Echo({
         broadcaster: 'socket.io',
         host: location.host,
