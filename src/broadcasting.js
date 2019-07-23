@@ -22,7 +22,7 @@ class Broadcasting extends EventEmitter {
     }
   }
 
-  start () {
+  _init () {
     if (this.echo) {
       return
     }
@@ -71,7 +71,7 @@ class Broadcasting extends EventEmitter {
   }
 
   connect (timeout) {
-    this.start()
+    this._init()
 
     return new Promise((resolve, reject) => {
       if (this.connected) {
@@ -89,7 +89,7 @@ class Broadcasting extends EventEmitter {
   }
 
   channel (name) {
-    this.start()
+    this._init()
 
     this._log(`channel ${name}`)
 
