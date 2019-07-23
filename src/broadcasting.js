@@ -70,10 +70,26 @@ class Broadcasting extends EventEmitter {
 
   }
 
+  connect (timeout) {
+    this.start()
+
+    return new Promise((resolve, reject) => {
+      if (this.connected) {
+        resolve()
+      } else if (timeout) {
+        const id = setTimeout(reject, timeout)
+        this.once('connected', () => {
+          clearTimeout(id)
+          resolve()
+        })
+      } else {
+        this.once('connected', resolve)
+      }
+    })
+  }
+
   channel (name) {
-    if (!this.echo) {
-      this.start()
-    }
+    this.start()
 
     this.log(`channel ${name}`)
 
