@@ -16,6 +16,7 @@
       "providers": [
         "Febalist\\Laravel\\Broadcasting\\BroadcastingServiceProvider"
       ]
-    }
+    },
+    "foxy": true
   }
 }
