@@ -6,19 +6,24 @@ class Broadcasting extends EventEmitter {
     super()
 
     this.config = app.broadcasting
-    this.connected = null
+    this.status = null
 
-    for (let event of ['connected', 'disconnected']) {
-      this.defineEvent(event)
-      this.on(event, () => {
-        this._log(event)
-      })
-    }
+    this.defineEvents(['online', 'offline', 'status'])
   }
 
   _log (message) {
-    if (window.console && console.log) {
+    if (window.console) {
       console.log(`broadcasting: ${message}`)
+    }
+  }
+
+  _status (status) {
+    if (this.status !== status) {
+      this.status = status
+      const event = status ? 'online' : 'offline'
+      this._log(event)
+      this.emit(event, status)
+      this.emit('status', status)
     }
   }
 
@@ -40,11 +45,7 @@ class Broadcasting extends EventEmitter {
       })
 
       this.echo.connector.pusher.connection.bind('state_change', states => {
-        const connected = states.current == 'connected'
-        if (this.connected !== connected) {
-          this.connected = connected
-          this.emit(connected ? 'connected' : 'disconnected')
-        }
+        this._status(states.current == 'connected')
       })
 
     } else if (this.config.driver == 'redis') {
@@ -56,12 +57,10 @@ class Broadcasting extends EventEmitter {
       })
 
       this.echo.connector.socket.on('connect', () => {
-        this.connected = true
-        this.emit('connected')
+        this._status(true)
       })
       this.echo.connector.socket.on('disconnect', () => {
-        this.connected = false
-        this.emit('disconnected')
+        this._status(false)
       })
 
     } else {
@@ -74,16 +73,16 @@ class Broadcasting extends EventEmitter {
     this._init()
 
     return new Promise((resolve, reject) => {
-      if (this.connected) {
+      if (this.status) {
         resolve()
       } else if (timeout) {
         const id = setTimeout(reject, timeout)
-        this.once('connected', () => {
+        this.once('online', () => {
           clearTimeout(id)
           resolve()
         })
       } else {
-        this.once('connected', resolve)
+        this.once('online', resolve)
       }
     })
   }
