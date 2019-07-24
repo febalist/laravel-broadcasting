@@ -95,28 +95,28 @@ class Broadcasting extends EventEmitter {
     }
   }
 
-  channel (name) {
+  channel (channel) {
     this._init()
 
-    this._log(`channel ${name}`)
+    this._log(`channel ${channel}`)
 
-    return this.echo.channel(name)
+    return this.echo.channel(channel)
   }
 
-  private () {
+  private (channel) {
     this._init()
 
-    this._log(`private ${name}`)
+    this._log(`private ${channel}`)
 
-    return this.echo.private(name)
+    return this.echo.private(channel)
   }
 
-  join () {
+  join (channel) {
     this._init()
 
-    this._log(`join ${name}`)
+    this._log(`join ${channel}`)
 
-    return this.echo.join(name)
+    return this.echo.join(channel)
   }
 
   leave (channel) {
