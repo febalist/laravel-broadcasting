@@ -103,6 +103,22 @@ class Broadcasting extends EventEmitter {
     return this.echo.channel(name)
   }
 
+  private () {
+    this._init()
+
+    this._log(`private ${name}`)
+
+    return this.echo.private(name)
+  }
+
+  join () {
+    this._init()
+
+    this._log(`join ${name}`)
+
+    return this.echo.join(name)
+  }
+
   leave (channel) {
     if (this.echo) {
       this.echo.leave(channel)
