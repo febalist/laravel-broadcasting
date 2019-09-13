@@ -1,7 +1,6 @@
 {
   "name": "febalist/laravel-broadcasting",
   "require": {
-    "foxy/foxy": "^1.0",
     "illuminate/support": "^5.8",
     "predis/predis": "^1.1",
     "pusher/pusher-php-server": "^4.0"
@@ -16,7 +15,6 @@
       "providers": [
         "Febalist\\Laravel\\Broadcasting\\BroadcastingServiceProvider"
       ]
-    },
-    "foxy": true
+    }
   }
 }
